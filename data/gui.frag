@@ -1,6 +1,4 @@
 #version 330 core
-//es
-//core
 
 // ES requires setting precision qualifier
 // Can be mediump or highp
@@ -8,6 +6,25 @@ precision highp float; // affects all floats (vec3, vec4 etc)
 
 //layout(location=0)
 
+#ifdef VULKAN
+layout(location = 0) out vec4 vFragColor;		//interpolated colour to fragment shader
+layout(binding=0) uniform sampler2D textureSampler;
+
+layout(std140, binding = 0) uniform UniformBlock
+{
+  vec4 SmoothColor;
+  vec2 SmoothTexcoord;
+  float index;
+  float width;
+  float height;
+  float totalwidth;
+  float totalheight;
+  float flip;
+  float flipVertical;
+  float time;
+} uniformBuffer;
+
+#else
 out vec4 vFragColor;	//fragment shader output
 
 //input form the vertex shader
@@ -22,9 +39,24 @@ in float o_totalwidth;
 in float o_totalheight;
 in float o_flip;
 in float o_flipVertical;
+in float o_time;
+//in vec2 o_rotation;
+#endif
 
 void main ()
 {
+#ifdef VULKAN
+    vec4 vSmoothColor = uniformBuffer.SmoothColor;
+    vec2 vSmoothTexcoord = uniformBuffer.SmoothTexcoord;
+    float o_index = uniformBuffer.index;
+    float o_width = uniformBuffer.width;
+    float o_height = uniformBuffer.height;
+    float o_totalwidth = uniformBuffer.totalwidth;
+    float o_totalheight = uniformBuffer.totalheight;
+    float o_flip = uniformBuffer.flip;
+    float o_flipVertical = uniformBuffer.flipVertical;
+    float o_time = uniformBuffer.time;
+#endif
     vec4 final;
 
     vec2 coords = vSmoothTexcoord;

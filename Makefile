@@ -28,7 +28,7 @@ PROJECT_FILES = $(SOURCES) data/project.json
 # Setup build platform rules 
 #############################################################################
 
-SOLIDCORE = ../../..
+SOLIDCORE = ../solid
 
 include $(SOLIDCORE)/Makefile.rules
 
