@@ -3,6 +3,8 @@
 #include <core/components/camera.h>
 #include <core/x-platform/scene.h>
 
+int bullets;
+
 class City : public IScene
 {
 private:
@@ -14,13 +16,14 @@ private:
     Text* title;
     Camera* cam;
     Array<Cube*> pickups;
-
-    int bullets;
+    Array<Cube*> enemies;
+    bool gameOver;
 
 public:
     void Init()
     {
         bullets = 0;
+        gameOver = false;
         floor  = new Cube(0, 0, -5, 10, 0.1, 10);
         house  = new Cube(1, 2, -3, 1, 1, 1);
         house->Uniform("colour", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
@@ -46,6 +49,15 @@ public:
             components.Add(pickup);
         }
 
+        for (int i = 0; i < 2; i++)
+        {
+            Cube* enemy = new Cube(5.0f - random.RandomRange(0, 10), 5.0f - random.RandomRange(0, 10), -4, 0.1, 0.1, 0.1);
+            enemy->Uniform("colour", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+            enemy->tag = "pickup";
+            enemies.Add(enemy);
+            components.Add(enemy);
+        }
+
         components.Add(floor);
         components.Add(player);
         components.Add(cam);
@@ -58,6 +70,13 @@ public:
 
     void Update()
     {
+        title->Update();
+
+        if (gameOver == true)
+        {
+            return;
+        }
+
         if (input.Held(input.Key.A))
         {
             *player->matrix.x -= 0.1f;
@@ -78,8 +97,6 @@ public:
         cam->position.x = *player->matrix.x;
         cam->position.y = *player->matrix.y - 2;
 
-        title->Update();
-
         door->matrix.Rotate(0.01, glm::vec3(0, 0, 1));
         door2->matrix.Rotate(0.01, glm::vec3(0, 0, 1));
     }
@@ -99,6 +116,43 @@ public:
                 }
             }
         }
+        for (unsigned int i = 0; i < enemies.Size(); i++)
+        {
+            if (enemies[i]->isVisible())
+            {
+                if (physics->Collide(enemies[i]->collisionBox, "player"))
+                {
+                    delete title;
+                    title = new Text("You lost");
+                    gameOver = true;
+                }
+            }
+        }
+
+        if (physics->Collide(door->collisionBox, "player"))
+        {
+            Application::NextScene();
+        }
+    }
+};
+
+class House : public IScene
+{
+public:
+    Camera* cam;
+
+    void Init()
+    {
+        cam = new Camera(glm::vec3(0,0,0), glm::vec3(0,1,0), glm::vec3(0,0.5,-1), 75);
+        components.Add(cam);
+    }
+
+    void Update()
+    {
+    }
+
+    void UpdateAfterPhysics()
+    {
     }
 };
 
@@ -106,6 +160,7 @@ int main(int argc, char **argv)
 {
     Application application(argc, argv);
     application.AddScene(new City);
+    application.AddScene(new House);
 
     return application.Exec();
 }
