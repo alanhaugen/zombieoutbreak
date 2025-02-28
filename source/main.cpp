@@ -114,9 +114,12 @@ private:
     bool gameOver;
 
 public:
+    bool isEnteringHouse;
+
     void Init()
     {
         bullets = 0;
+        isEnteringHouse = false;
         gameOver = false;
         floor  = new Cube(0, 0, -5, 10, 0.1, 10);
         house  = new Cube(1, 2, -3, 1, 1, 1);
@@ -132,6 +135,8 @@ public:
         player->collisionBox->type = "player";
         title = new Text("You have picked up: " + String(bullets) + " / 9 pickups");
         cam = new Camera(glm::vec3(0,0,0), glm::vec3(0,1,0), glm::vec3(0,0.5,-1), 75);
+
+        door->collisionBox->dimensions.z = 100.0f;
 
         for (int i = 0; i < 8; i++)
         {
@@ -235,7 +240,10 @@ public:
 
         if (physics->Collide(door->collisionBox, "player"))
         {
-            //Application::NextScene();
+            isEnteringHouse = true;
+
+            *player->matrix.x = 0;
+            *player->matrix.y = 0;
         }
     }
 };
@@ -249,8 +257,12 @@ private:
     Cube* pickup;
 
 public:
+    bool isExitingHouse;
+
     void Init()
     {
+        isExitingHouse = false;
+
         cam = new Camera(glm::vec3(0,0,0), glm::vec3(0,1,0), glm::vec3(0,0.5,-1), 75);
         components.Add(cam);
 
@@ -288,6 +300,14 @@ public:
             *player->matrix.y -= 0.1f;
         }
 
+        if (*player->matrix.x > 4 || *player->matrix.x < -4 ||
+            *player->matrix.y > 5 || *player->matrix.y < -2)
+        {
+            isExitingHouse = true;
+            *player->matrix.x = 0;
+            *player->matrix.y = 0;
+        }
+
         title->Update();
     }
 
@@ -316,8 +336,8 @@ public:
 class Game : public IScene
 {
 private:
-    IScene* city;
-    IScene* house;
+    City* city;
+    House* house;
     IScene* activeScene;
     bool isInCity;
 
@@ -338,15 +358,22 @@ public:
         if (isInCity)
         {
             activeScene = city;
+
+            if (city->isEnteringHouse)
+            {
+                isInCity = false;
+                city->isEnteringHouse = false;
+            }
         }
         else
         {
             activeScene = house;
-        }
 
-        if (input.Pressed(input.Key.SPACE))
-        {
-            isInCity = !isInCity;
+            if (house->isExitingHouse)
+            {
+                isInCity = true;
+                house->isExitingHouse = false;
+            }
         }
 
         // Run the game logic
