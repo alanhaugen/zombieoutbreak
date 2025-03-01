@@ -15,7 +15,7 @@ public:
 
     BezierCurve()
     {
-        d = 4;
+        d = 3;
     }
 
     // deCasteljau's algorithm for evaluating Bezier curves
@@ -23,7 +23,7 @@ public:
     {
         glm::vec3 a[4]; // 4=d+1 for kubisk Bezier for (int i=0; i<4; i++)
 
-        for (int i=0; i < 4; i++)
+        for (int i = 0; i < 4; i++)
         {
             a[i] = c[i];
         }
@@ -40,7 +40,6 @@ public:
     }
 };
 
-
 class Enemy : public Cube
 {
 private:
@@ -55,10 +54,10 @@ public:
         goRight = true;
         tick = 0.0f;
 
-        path.c[0] = glm::vec3(-6, 0, 0);
-        path.c[1] = glm::vec3(0, 4, 0);
-        path.c[2] = glm::vec3(3, 4, 0);
-        path.c[3] = glm::vec3(6, 0, 0);
+        path.c[0] = glm::vec3(x, y, z);
+        path.c[1] = glm::vec3(-x, -y, z);
+        path.c[2] = glm::vec3(x, -y, z);
+        path.c[3] = glm::vec3(x, y, z);
     }
 
     void Update()
@@ -74,7 +73,7 @@ public:
 
         *matrix.x = path.EvaluateBezier(tick).x;
         *matrix.y = path.EvaluateBezier(tick).y;
-        //*matrix.z = path.EvaluateBezier(tick).z;
+        *matrix.z = path.EvaluateBezier(tick).z;
 
         /*if (*matrix.x > 9.0f)
         {
