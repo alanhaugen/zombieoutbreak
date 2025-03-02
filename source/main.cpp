@@ -104,7 +104,7 @@ private:
     Cube* door;
     Cube* door2;
     Cube* player;
-    Text* title;
+    //Text* title;
     Camera* cam;
     Array<Cube*> pickups;
     Array<Cube*> enemies;
@@ -130,7 +130,7 @@ public:
         player->Uniform("colour", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
         player->tag = "player";
         player->collisionBox->type = "player";
-        title = new Text("You have picked up: " + String(bullets) + " / 9 pickups");
+        //title = new Text("You have picked up: " + String(bullets) + " / 9 pickups");
         cam = new Camera(glm::vec3(0,0,0), glm::vec3(0,1,0), glm::vec3(0,0.5,-1), 75);
 
         door->collisionBox->dimensions.z = 100.0f;
@@ -166,7 +166,7 @@ public:
 
     void Update()
     {
-        title->Update();
+        //title->Update();
 
         if (gameOver == true)
         {
@@ -209,13 +209,13 @@ public:
 
                     if (bullets >= 9)
                     {
-                        delete title;
-                        title = new Text("You Won");
+                        //delete title;
+                        //title = new Text("You Won");
                     }
                     else
                     {
-                        delete title;
-                        title = new Text("You have picked up: " + String(bullets) + " / 9 pickups");
+                        //delete title;
+                        //title = new Text("You have picked up: " + String(bullets) + " / 9 pickups");
                     }
 
                     pickups[i]->Hide();
@@ -228,8 +228,8 @@ public:
             {
                 if (physics->Collide(enemies[i]->collisionBox, "player"))
                 {
-                    delete title;
-                    title = new Text("You lost");
+                    //delete title;
+                    //title = new Text("You lost");
                     gameOver = true;
                 }
             }
@@ -250,7 +250,7 @@ class House : public IScene
 private:
     Camera* cam;
     Cube* player;
-    Text* title;
+    //Text* title;
     Cube* pickup;
 
 public:
@@ -275,7 +275,7 @@ public:
         pickup->collisionBox->type = "pickup";
         components.Add(pickup);
 
-        title = new Text("You have picked up: " + String(bullets) + " / 9 pickups");
+        //title = new Text("You have picked up: " + String(bullets) + " / 9 pickups");
     }
 
     void Update()
@@ -305,7 +305,7 @@ public:
             *player->matrix.y = 0;
         }
 
-        title->Update();
+        //title->Update();
     }
 
     void UpdateAfterPhysics()
@@ -316,13 +316,13 @@ public:
 
             if (bullets >= 9)
             {
-                delete title;
-                title = new Text("You Won");
+                //delete title;
+                //title = new Text("You Won");
             }
             else
             {
-                delete title;
-                title = new Text("You have picked up: " + String(bullets) + " / 9 pickups");
+                //delete title;
+                //title = new Text("You have picked up: " + String(bullets) + " / 9 pickups");
             }
 
             pickup->Hide();

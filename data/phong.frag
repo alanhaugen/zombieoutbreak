@@ -1,13 +1,28 @@
 #version 330 core
-//es
 
-// ES requires setting precision qualifier
 // Can be mediump or highp
 precision highp float; // affects all floats (vec3, vec4 etc)
 
 // Thanks to https://web.archive.org/web/20180816064924/http://www.sunandblackcat.com/tipFullView.php?l=eng&topicid=30
 
 // data from vertex shader
+#ifdef VULKAN
+layout(location=0) out vec4 resultingColor;
+
+layout(location = 0) in vec4 vSmoothColor;
+
+layout(binding=0) uniform sampler2D u_diffuseTexture;
+
+layout(std140, binding = 0) uniform UniformBlock
+{
+  vec3 normal;
+  vec3 toLight;
+  vec3 toCamera;
+  vec2 texcoords;
+  vec4 colour;
+} uniformBuffer;
+
+#else
 in vec3 o_normal;
 in vec3 o_toLight;
 in vec3 o_toCamera;
@@ -48,6 +63,11 @@ uniform float u_matShininess; // = 64;*/
     uniform vec3 u_matSpecularReflectance;
     uniform float u_matShininess;
 */
+
+smooth in vec4 vSmoothColor;		//interpolated colour to fragment shader
+
+#endif
+
 //TODO: remove these, use uniforms instead (see above)
     vec3 u_lightAmbientIntensity = vec3(0.6, 0.3, 0.0);
     vec3 u_lightDiffuseIntensity = vec3(1.0, 0.5, 0.0);
@@ -58,10 +78,6 @@ uniform float u_matShininess; // = 64;*/
     vec3 u_matDiffuseReflectance = vec3(1.0, 1.0, 1.0);
     vec3 u_matSpecularReflectance = vec3(1.0, 1.0, 1.0);
     float u_matShininess = 64.0;
-
-smooth in vec4 vSmoothColor;		//interpolated colour to fragment shader
-
-
 /////////////////////////////////////////////////////////
 
 // returns intensity of reflected ambient lighting
@@ -110,6 +126,13 @@ vec3 specularLighting(in vec3 N, in vec3 L, in vec3 V)
 
 void main(void)
 {
+#ifdef VULKAN
+    vec3 o_normal = uniformBuffer.normal;
+    vec3 o_toLight = uniformBuffer.toLight;
+    vec3 o_toCamera = uniformBuffer.toCamera;
+    vec2 o_texcoords = uniformBuffer.texcoords;
+    vec4 o_colour = uniformBuffer.colour;
+#endif
     // normalize vectors after interpolation
     vec3 L = normalize(o_toLight);
     vec3 V = normalize(o_toCamera);
