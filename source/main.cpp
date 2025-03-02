@@ -7,26 +7,24 @@ int bullets;
 
 class BezierCurve
 {
-private:
-    int d;
-
 public:
-    glm::vec3 c[4];
+    Array<glm::vec3> c;
 
     BezierCurve()
     {
-        d = 3;
     }
 
     // deCasteljau's algorithm for evaluating Bezier curves
     glm::vec3 EvaluateBezier(float t)
     {
-        glm::vec3 a[4]; // 4=d+1 for kubisk Bezier for (int i=0; i<4; i++)
+        Array<glm::vec3> a(c.Size()); // 4=d+1 for kubisk Bezier for (int i=0; i<4; i++)
 
         for (int i = 0; i < 4; i++)
         {
             a[i] = c[i];
         }
+
+        int d = c.Size() - 1;
 
         for (int k = d; k > 0; k--) //for (int k=1; k<=d; k++) {
         {
@@ -54,10 +52,10 @@ public:
         goRight = true;
         tick = 0.0f;
 
-        path.c[0] = glm::vec3(x, y, z);
-        path.c[1] = glm::vec3(-x, -y, z);
-        path.c[2] = glm::vec3(x, -y, z);
-        path.c[3] = glm::vec3(x, y, z);
+        path.c.Add(glm::vec3(x, y, z));
+        path.c.Add(glm::vec3(-x, -y, z));
+        path.c.Add(glm::vec3(x, -y, z));
+        path.c.Add(glm::vec3(x, y, z));
     }
 
     void Update()
