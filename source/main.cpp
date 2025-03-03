@@ -2,41 +2,9 @@
 #include <core/components/cube.h>
 #include <core/components/camera.h>
 #include <core/x-platform/scene.h>
+#include <core/x-platform/curves.h>
 
 int bullets;
-
-class BezierCurve
-{
-public:
-    Array<glm::vec3> c;
-
-    BezierCurve()
-    {
-    }
-
-    // deCasteljau's algorithm for evaluating Bezier curves
-    glm::vec3 EvaluateBezier(float t)
-    {
-        Array<glm::vec3> a(c.Size()); // 4=d+1 for kubisk Bezier for (int i=0; i<4; i++)
-
-        for (int i = 0; i < 4; i++)
-        {
-            a[i] = c[i];
-        }
-
-        int d = c.Size() - 1;
-
-        for (int k = d; k > 0; k--) //for (int k=1; k<=d; k++) {
-        {
-            for (int i = 0; i < k; i++) //for (int i=0; i<=d=k; i++) a[i] = a[i] * (1=t) + a[i+1] * t;
-            {
-                a[i] = a[i] * (1 - t) + a[i + 1] * t;
-            }
-        }
-
-        return a[0];
-    }
-};
 
 class Enemy : public Cube
 {
@@ -47,7 +15,7 @@ private:
 
 public:
     Enemy(float x, float y, float z, float length, float width, float height)
-        : Cube(x, y, z, length, width, height)
+        : Cube(x, y, z, length, width, height, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f))
     {
         goRight = true;
         tick = 0.0f;
@@ -118,41 +86,36 @@ public:
         bullets = 0;
         isEnteringHouse = false;
         gameOver = false;
-        floor  = new Cube(0, 0, -5, 10, 0.1, 10);
-        house  = new Cube(1, 2, -3, 1, 1, 1);
-        house->Uniform("colour", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-        door = new Cube(1, 1.0, -3.5, .3f, .5, .1f);
-        door2 = new Cube(1, 1.0, -3.5, .3f, .5, .1f);
-        door->Uniform("colour", glm::vec4(0.1, 0.0f, 1.0f, 1.0f));
-        door2->Uniform("colour", glm::vec4(0.1, 0.0f, 1.0f, 1.0f));
-        floor->Uniform("colour", glm::vec4(133 / 255.f, 202 / 255.f, 93 / 255.f, 1.0f));
-        player = new Cube(0, 0, -4, 0.1, 0.1, 0.1);
-        player->Uniform("colour", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-        player->tag = "player";
-        player->collisionBox->type = "player";
-        //title = new Text("You have picked up: " + String(bullets) + " / 9 pickups");
-        cam = new Camera(glm::vec3(0,0,0), glm::vec3(0,1,0), glm::vec3(0,0.5,-1), 75);
 
-        door->collisionBox->dimensions.z = 100.0f;
-
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 0; i++)
         {
-            Cube* pickup = new Cube(5.0f - random.RandomRange(0, 10), 5.0f - random.RandomRange(0, 10), -4, 0.1, 0.1, 0.1);
-            pickup->Uniform("colour", glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+            Cube* pickup = new Cube(5.0f - random.RandomRange(0, 10), 5.0f - random.RandomRange(0, 10), -4, 0.1, 0.1, 0.1,
+                                    glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
             pickup->tag = "pickup";
             pickup->collisionBox->type = "pickup";
             pickups.Add(pickup);
             components.Add(pickup);
         }
 
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 0; i++)
         {
             Enemy* enemy = new Enemy(5.0f - random.RandomRange(0, 10), 5.0f - random.RandomRange(0, 10), -4, 0.1, 0.1, 0.1);
-            enemy->Uniform("colour", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
             enemy->tag = "pickup";
             enemies.Add(enemy);
             components.Add(enemy);
         }
+
+        player = new Cube(0, 0, -4, 0.1, 0.1, 0.1, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+        door = new Cube(1, 1.0, -3.5, .3f, .5, .1f, glm::vec4(0.1, 0.0f, 1.0f, 1.0f));
+        door2 = new Cube(1, 1.0, -3.5, .3f, .5, .1f, glm::vec4(0.1, 0.0f, 1.0f, 1.0f));
+        house  = new Cube(1, 2, -3, 1, 1, 1, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+        floor  = new Cube(0, 0, -5, 10, 0.1, 10, glm::vec4(133 / 255.f, 202 / 255.f, 93 / 255.f, 1.0f));
+        player->tag = "player";
+        player->collisionBox->type = "player";
+        //title = new Text("You have picked up: " + String(bullets) + " / 9 pickups");
+        cam = new Camera(glm::vec3(0,0,0), glm::vec3(0,-1,0), glm::vec3(0,0.5,-1), 75);
+
+        door->collisionBox->dimensions.z = 100.0f;
 
         components.Add(floor);
         components.Add(player);
@@ -175,11 +138,11 @@ public:
 
         if (input.Held(input.Key.A))
         {
-            *player->matrix.x -= 0.1f;
+            *player->matrix.x += 0.1f;
         }
         if (input.Held(input.Key.D))
         {
-            *player->matrix.x += 0.1f;
+            *player->matrix.x -= 0.1f;
         }
         if (input.Held(input.Key.W))
         {
@@ -402,4 +365,3 @@ int main(int argc, char **argv)
 
     return application.Exec();
 }
-
