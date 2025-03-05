@@ -9,7 +9,6 @@ int bullets;
 class Enemy : public Cube
 {
 private:
-    bool goRight;
     float tick;
     BezierCurve path;
 
@@ -17,7 +16,6 @@ public:
     Enemy(float x, float y, float z, float length, float width, float height)
         : Cube(x, y, z, length, width, height, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f))
     {
-        goRight = true;
         tick = 0.0f;
 
         path.c.Add(glm::vec3(x, y, z));
@@ -40,27 +38,6 @@ public:
         *matrix.x = path.EvaluateBezier(tick).x;
         *matrix.y = path.EvaluateBezier(tick).y;
         *matrix.z = path.EvaluateBezier(tick).z;
-
-        /*if (*matrix.x > 9.0f)
-        {
-            goRight = false;
-        }
-
-        if (*matrix.x < -5.0f)
-        {
-            goRight = true;
-        }
-
-        if (goRight)
-        {
-            *matrix.x += 0.1;
-        }
-        else
-        {
-            *matrix.x -= 0.1;
-        }
-
-        *matrix.y += sin(tick) / 10;*/
     }
 };
 
@@ -87,7 +64,7 @@ public:
         isEnteringHouse = false;
         gameOver = false;
 
-        for (int i = 0; i < 0; i++)
+        for (int i = 0; i < 8; i++)
         {
             Cube* pickup = new Cube(5.0f - random.RandomRange(0, 10), 5.0f - random.RandomRange(0, 10), -4, 0.1, 0.1, 0.1,
                                     glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
@@ -97,7 +74,7 @@ public:
             components.Add(pickup);
         }
 
-        for (int i = 0; i < 0; i++)
+        for (int i = 0; i < 2; i++)
         {
             Enemy* enemy = new Enemy(5.0f - random.RandomRange(0, 10), 5.0f - random.RandomRange(0, 10), -4, 0.1, 0.1, 0.1);
             enemy->tag = "pickup";
@@ -223,17 +200,15 @@ public:
     {
         isExitingHouse = false;
 
-        cam = new Camera(glm::vec3(0,0,0), glm::vec3(0,1,0), glm::vec3(0,0.5,-1), 75);
+        cam = new Camera(glm::vec3(0,0,0), glm::vec3(0,-1,0), glm::vec3(0,0.5,-1), 75);
         components.Add(cam);
 
-        player = new Cube(0, 0, -4, 0.1, 0.1, 0.1);
-        player->Uniform("colour", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+        player = new Cube(0, 0, -4, 0.1, 0.1, 0.1, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
         player->tag = "player";
         player->collisionBox->type = "player";
         components.Add(player);
 
-        pickup = new Cube(0,2.5, -4, 0.1, 0.1, 0.1);
-        pickup->Uniform("colour", glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+        pickup = new Cube(0,2.5, -4, 0.1, 0.1, 0.1, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
         pickup->tag = "pickup";
         pickup->collisionBox->type = "pickup";
         components.Add(pickup);
@@ -245,11 +220,11 @@ public:
     {
         if (input.Held(input.Key.A))
         {
-            *player->matrix.x -= 0.1f;
+            *player->matrix.x += 0.1f;
         }
         if (input.Held(input.Key.D))
         {
-            *player->matrix.x += 0.1f;
+            *player->matrix.x -= 0.1f;
         }
         if (input.Held(input.Key.W))
         {
