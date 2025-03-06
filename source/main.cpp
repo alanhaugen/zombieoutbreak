@@ -151,12 +151,15 @@ public:
                     {
                         //delete title;
                         //title = new Text("You Won");
+                        Log("You Won");
                     }
                     else
                     {
                         //delete title;
                         //title = new Text("You have picked up: " + String(bullets) + " / 9 pickups");
                     }
+
+                    Log("Picked up pickup at x: " + String(*pickups[i]->matrix.x) + " and y: " + String(*pickups[i]->matrix.y));
 
                     pickups[i]->Hide();
                 }
@@ -170,6 +173,7 @@ public:
                 {
                     //delete title;
                     //title = new Text("You lost");
+                    Log("You lost");
                     gameOver = true;
                 }
             }
@@ -256,11 +260,13 @@ public:
             {
                 //delete title;
                 //title = new Text("You Won");
+                Log("You Won");
             }
             else
             {
                 //delete title;
                 //title = new Text("You have picked up: " + String(bullets) + " / 9 pickups");
+                Log("Picked up pickup at x: " + String(*pickup->matrix.x) + " and y: " + String(*pickup->matrix.y));
             }
 
             pickup->Hide();
