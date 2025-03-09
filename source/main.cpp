@@ -48,6 +48,7 @@ private:
     Cube* house;
     Cube* door;
     Cube* door2;
+    Cube* doorActiveBox;
     Cube* player;
     //Text* title;
     Camera* cam;
@@ -85,6 +86,8 @@ public:
         player = new Cube(0, 0, -4, 0.1, 0.1, 0.1, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
         door = new Cube(1, 1.0, -3.5, .3f, .5, .1f, glm::vec4(0.1, 0.0f, 1.0f, 1.0f));
         door2 = new Cube(1, 1.0, -3.5, .3f, .5, .1f, glm::vec4(0.1, 0.0f, 1.0f, 1.0f));
+        doorActiveBox = new Cube(1, 1.0, -3.5, 0.9001f, 0.9001f, 0.9001f);
+        doorActiveBox->Hide();
         house  = new Cube(1, 2, -3, 1, 1, 1, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
         floor  = new Cube(0, 0, -5, 10, 0.1, 10, glm::vec4(133 / 255.f, 202 / 255.f, 93 / 255.f, 1.0f));
         player->tag = "player";
@@ -100,6 +103,7 @@ public:
         components.Add(house);
         components.Add(door);
         components.Add(door2);
+        components.Add(doorActiveBox);
 
         door2->matrix.Rotate(M_PI / 2, glm::vec3(0, 0, 1));
     }
@@ -132,9 +136,6 @@ public:
 
         cam->position.x = *player->matrix.x;
         cam->position.y = *player->matrix.y - 2;
-
-        door->matrix.Rotate(0.01, glm::vec3(0, 0, 1));
-        door2->matrix.Rotate(0.01, glm::vec3(0, 0, 1));
     }
 
     void UpdateAfterPhysics()
@@ -185,6 +186,12 @@ public:
 
             *player->matrix.x = 0;
             *player->matrix.y = 0;
+        }
+
+        if (physics->Collide(doorActiveBox->collisionBox, "player"))
+        {
+            door->matrix.Rotate(0.01, glm::vec3(0, 0, 1));
+            door2->matrix.Rotate(0.01, glm::vec3(0, 0, 1));
         }
     }
 };
