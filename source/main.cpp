@@ -14,7 +14,7 @@ private:
 
 public:
     Enemy(float x, float y, float z, float length, float width, float height)
-        : Cube(x, y, z, length, width, height, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f))
+        : Cube(x, y, z, length, width, height, "", true, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f))
     {
         tick = 0.0f;
 
@@ -68,7 +68,7 @@ public:
         for (int i = 0; i < 8; i++)
         {
             Cube* pickup = new Cube(5.0f - random.RandomRange(0, 10), 5.0f - random.RandomRange(0, 10), -4, 0.1, 0.1, 0.1,
-                                    glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+                                    "", true, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
             pickup->tag = "pickup";
             pickup->collisionBox->type = "pickup";
             pickups.Add(pickup);
@@ -83,13 +83,13 @@ public:
             components.Add(enemy);
         }
 
-        player = new Cube(0, 0, -4, 0.1, 0.1, 0.1, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-        door = new Cube(1, 1.0, -3.5, .3f, .5, .1f, glm::vec4(0.1, 0.0f, 1.0f, 1.0f));
-        door2 = new Cube(1, 1.0, -3.5, .3f, .5, .1f, glm::vec4(0.1, 0.0f, 1.0f, 1.0f));
+        player = new Cube(0, 0, -4, 0.1, 0.1, 0.1, "", true, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+        door = new Cube(1, 1.0, -3.5, .3f, .5, .1f, "", true, glm::vec4(0.1, 0.0f, 1.0f, 1.0f));
+        door2 = new Cube(1, 1.0, -3.5, .3f, .5, .1f, "", true, glm::vec4(0.1, 0.0f, 1.0f, 1.0f));
         doorActiveBox = new Cube(1, 1.0, -3.5, 0.9001f, 0.9001f, 0.9001f);
         doorActiveBox->Hide();
-        house  = new Cube(1, 2, -3, 1, 1, 1, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-        floor  = new Cube(0, 0, -5, 10, 0.1, 10, glm::vec4(133 / 255.f, 202 / 255.f, 93 / 255.f, 1.0f));
+        house  = new Cube(1, 2, -3, 1, 1, 1, "", true, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+        floor  = new Cube(0, 0, -5, 10, 0.1, 10, "", true, glm::vec4(133 / 255.f, 202 / 255.f, 93 / 255.f, 1.0f));
         player->tag = "player";
         player->collisionBox->type = "player";
         //title = new Text("You have picked up: " + String(bullets) + " / 9 pickups");
@@ -105,10 +105,10 @@ public:
         components.Add(door2);
         components.Add(doorActiveBox);
 
-        door2->matrix.Rotate(M_PI / 2, glm::vec3(0, 0, 1));
+        door2->matrix.Rotate(3.141593 / 2, glm::vec3(0, 0, 1));
     }
 
-    void Update()
+    void Update(float dt)
     {
         //title->Update();
 
@@ -214,12 +214,12 @@ public:
         cam = new Camera(glm::vec3(0,0,0), glm::vec3(0,-1,0), glm::vec3(0,0.5,-1), 75);
         components.Add(cam);
 
-        player = new Cube(0, 0, -4, 0.1, 0.1, 0.1, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+        player = new Cube(0, 0, -4, 0.1, 0.1, 0.1, "", true, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
         player->tag = "player";
         player->collisionBox->type = "player";
         components.Add(player);
 
-        pickup = new Cube(0,2.5, -4, 0.1, 0.1, 0.1, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+        pickup = new Cube(0,2.5, -4, 0.1, 0.1, 0.1, "", true, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
         pickup->tag = "pickup";
         pickup->collisionBox->type = "pickup";
         components.Add(pickup);
@@ -227,7 +227,7 @@ public:
         //title = new Text("You have picked up: " + String(bullets) + " / 9 pickups");
     }
 
-    void Update()
+    void Update(float dt)
     {
         if (input.Held(input.Key.A))
         {
@@ -301,7 +301,7 @@ public:
         isInCity = true;
     }
 
-    void Update()
+    void Update(float dt)
     {
         if (isInCity)
         {
@@ -325,7 +325,7 @@ public:
         }
 
         // Run the game logic
-        activeScene->Update();
+        activeScene->Update(dt);
 
         // Update game components
         for (unsigned int i = 0; i < activeScene->components.Size(); i++)
